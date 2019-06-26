@@ -1,0 +1,153 @@
+<br />
+<br />
+<div>
+	<div class="row">
+		<div class="col-sm">
+			<h4>Liste des jeux</h4>
+			<div *ngIf="games != undefined">
+			<h5><span class="float-left">Total jeu : {{games.game_count}}</span></h5><br /><br />
+				<div *ngFor="let item of games.games">
+					<div class="">
+						<button type="button" class="btn btn-success" (click)="filterFriendGame(item.appid);">
+							<img class="img-responsive float-left" src="http://media.steampowered.com/steamcommunity/public/images/apps/{{item.appid}}/{{ item.img_icon_url}}.jpg" alt="{{item.name}}" />
+							<span>{{ item.name }} </span>
+						</button>
+					</div>
+					<br />
+				</div>
+			</div>
+		</div>
+		<div class="col-sm">
+			<div *ngIf="!disabled">
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{profile.personaname}}</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-sm-auto col-md-auto">
+								<img class="img-responsive rounded" src="{{ profile.avatarmedium }}" />
+							</div>
+							<div class="col-sm">
+								<span class="float-left">Date d'inscription : {{profile.timecreated * 1000 | date:'yyyy-MM-dd'}}</span><br />
+								<span class="float-left">Pays : </span><img class="img-responsive pull-left" src="https://steamcommunity-a.akamaihd.net/public/images/countryflags/{{ profile.loccountrycode | lowercase }}.gif" alt="FR" />
+
+							</div>
+						</div>
+						<button type="button" class="btn btn-success" (click)="test();">Test</button>
+						<button type="button" class="btn btn-success" (click)="getFriendList();">See all friends</button>
+					</div>
+				</div>
+
+				<div *ngIf="compared">
+					<div *ngIf="compareSelf != undefined">
+						<div *ngIf="compareSelf.playerstats != undefined">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>Statistics</th>
+										<th>Self</th>
+										<th>Other</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr *ngFor="let item of compareSelf.playerstats.stats; let i=index">
+										<td >{{item.name}}</td>
+										<td >{{item.value}}</td>
+										<td>
+											<div *ngIf="compareOther != undefined">
+												<div *ngIf="compareOther.playerstats != undefined">
+													<div *ngIf="compareOther.playerstats.stats != undefined">
+														<div *ngIf="compareOther.playerstats.stats[i] != undefined">
+															{{ compareOther.playerstats.stats[i].value}}
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<br />
+							<br />
+
+							<div *ngIf="compareSelf.playerstats.achievements != undefined">
+								<table class="table">
+									<thead>
+										<tr>
+											<th scope="col">Achievements</th>
+											<th scope="col">Self</th>
+											<th scope="col">Other </th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr *ngFor="let item of compareSelf.playerstats.achievements; let i=index">
+											<th colspan="1">{{item.name}}</th>
+											<td *ngIf="item.achieved == 1" >Done</td>
+											<td *ngIf="item.achieved == 0" >Not Done</td>
+											<td *ngIf="compareOther.playerstats.achievements != undefined">
+												<div *ngIf="compareOther.playerstats.achievements[i].achieved == 1">Done</div>
+												<div *ngIf="compareOther.playerstats.achievements[i].achieved == 0">Not Done</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div *ngIf="!compared">
+					<div *ngIf="friends != undefined">
+						<div *ngFor="let item of friends">
+							<ng-template [ngIf]="filtered">
+								<div *ngIf="item.game != undefined">
+									<div *ngIf="item.game.game_count == 1">
+									{{ item.info.personaname }} | {{duration_for(item.game.games[0].playtime_forever) }}<br />
+									<button type="button" class="btn btn-success" (click)="compareFriend(item.steamid,item.game.games[0].appid);">Compare </button>
+									</div>
+								</div>
+								</ng-template>
+								<ng-template [ngIf]="!filtered">
+									<ng-template [ngIf]="item != undefined">
+										<ng-template [ngIf]="item.info != undefined">
+											<div>
+												<img class="img-responsive rounded float-left" src="{{ item.info.avatar }}" />
+												{{ item.info.personaname }} | {{item.friend_since * 1000 | date:'yyyy-MM-dd'}}
+											</div>
+											<br />
+										</ng-template>
+									</ng-template>
+								</ng-template>
+						</div>
+					</div>
+				</div>
+
+				<div *ngIf="myData != undefined">
+					<pre> {{ myData | json }} </pre>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm">
+		<div *ngIf="sortedGames != undefined">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Time Played</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let item of sortedGames">
+						<td >{{item.name}}</td>
+						<td >{{duration_for(item.playtime_forever)}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<br />
+</div>

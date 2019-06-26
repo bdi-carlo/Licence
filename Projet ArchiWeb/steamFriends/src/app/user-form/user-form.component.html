@@ -1,0 +1,17 @@
+<div class="container">
+	<form (ngSubmit)="onSubmit()" #userForm="ngForm">
+		<div class="form-group">
+			<label for="id">Steam ID</label>
+			<input type="text" class="form-control" id="steamId"
+						required
+						[(ngModel)]="model" name="steamId"
+						#steamId="ngModel">
+			<div [hidden]="steamId.valid || steamId.pristine"
+					class="alert alert-danger">
+				Steam ID is required
+			</div>
+		</div>
+		<button type="submit" class="btn btn-success" (click)="newUser();" [disabled]="!userForm.form.valid">Submit</button>
+	</form>
+<app-user [user]= "user"></app-user>
+</div>

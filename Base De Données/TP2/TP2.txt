@@ -1,0 +1,120 @@
+---FIN DU SQL NON PROCEDURAL
+--ROLE
+
+ALTER ROLE u_l3info009 WITH PASSWORD 'tennis';
+
+DROP ROLE l3info009_008;
+CREATE ROLE l3info009_008;
+GRANT l3info009_008 TO u_l3info009,u_l3info008;
+
+SET ROLE l3info009_008;
+
+
+--SCHEMA
+
+CREATE SCHEMA u_l3info008;
+CREATE SCHEMA u_l3info009;
+
+
+--PRIVILEGES
+
+
+---SQL PROCEDURAL
+--AJOUT…
+
+CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;
+
+
+--PREMIER PAS
+
+1)
+CREATE FUNCTION bonjour() RETURNS varchar(20) AS $$
+BEGIN
+	RAISE NOTICE 'Bonjour % %' , current_user, ',quelle belle journée n''est-ce pas?' ;
+	RETURN '';
+END;
+$$LANGUAGE plpgsql;
+SELECT bonjour();
+
+2)
+CREATE FUNCTION compar(a int, b int) RETURNS record AS $$
+DECLARE
+	min int;
+	max int;
+	equal int;
+	mon_rec record;
+BEGIN
+	RAISE NOTICE 'a vaut % ', a;
+	RAISE NOTICE 'b vaut % ', b;
+
+	IF a = b THEN
+		equal := a;
+		SELECT 'equal='||equal INTO mon_rec;
+	ELSIF a < b THEN
+		min := a;
+		max := b;
+		SELECT 'min='||min||','||'max='||max INTO mon_rec;
+	ELSE
+		min := b;
+		max := a;
+		SELECT 'min='||min||','||'max='||max INTO mon_rec;
+	END IF;
+
+	RETURN mon_rec;
+END;
+$$LANGUAGE plpgsql;
+SELECT compar(1,2);
+
+
+---PLATEFORME
+--Rappel
+
+3)
+ALTER TABLE visiteur ADD nom varchar(20);
+ALTER TABLE visiteur ADD prenom varchar(20);
+
+4)
+CREATE FUNCTION maj_nom_prenom(log varchar(20), lastName varchar(20), firstName varchar(20)) RETURNS void AS $$
+BEGIN
+	UPDATE visiteur SET prenom=firstName,nom=lastName WHERE visiteur.login=log;
+END;
+$$LANGUAGE plpgsql;
+SELECT maj_nom_prenom('Billy','Bil','lly');
+
+5)
+CREATE FUNCTION listing(gameName varchar(30), log varchar(20)) RETURNS SETOF record AS $$
+BEGIN
+
+END;
+$$LANGUAGE plpgsql;
+
+
+---EXAMEN
+
+1)
+SELECT nom_jeu,(SELECT COUNT(id_avatar) FROM partie WHERE id_jeu=ANY(SELECT id_jeu FROM jeu WHERE nom_jeu=nom_jeu)) FROM jeu GROUP BY nom_jeu;
+
+2)
+CREATE FUNCTION stocker(nbJoueurs int, gameName varchar(30)) RETURNS void AS $$
+	UPDATE jeu SET nb_joueur_max=nbJoueurs WHERE nom_jeu=gameName
+$$LANGUAGE SQL;
+3)
+SELECT stocker(5,'Plants vs Zombies');
+
+4)
+CREATE FUNCTION jeu_plus_avatar(log varchar(20), lastName varchar(20), firstName varchar(20)) RETURNS varchar(30) AS $$
+DECLARE
+	gameName varchar(30);
+BEGIN
+	gameName=SELECT
+
+	IF  gameName '%a%' THEN
+		RAISE NOTICE 'Waouh!';
+	ELSE
+		RAISE NOTICE 'Bof';
+	END IF;
+
+	RETURN gameName;
+END;
+$$LANGUAGE plpgsql;
+SELECT maj_nom_prenom('Billy','Bil','lly');

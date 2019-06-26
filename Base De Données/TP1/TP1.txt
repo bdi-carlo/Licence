@@ -1,0 +1,104 @@
+--CONNEXION
+
+ssh info
+psql --dbname=bd_l3info009 --username=u_l3info009
+
+
+--DATA BASE
+
+CREATE DATABASE bd_l3info009 OWNER u_l3info009;
+
+
+--SCHEMA
+
+CREATE SCHEMA u_l3info009;
+CREATE SCHEMA TP1_jeu;
+SET search_path TO "TP1_jeu","u_l3info009","$user";
+DROP SCHEMA public;
+
+
+--TABLES
+
+CREATE TABLE jeu (
+	id_jeu serial PRIMARY KEY,
+	nom_jeu varchar(20) NOT NULL,
+	type varchar(20) CHECK( VALUE IN('role','plateau','tower defense','MMORPG','Autre')),
+	nb_joueur integer
+);
+
+CREATE TABLE partie (
+	id_avatar bigint REFERENCES avatar,
+  id_jeu bigint REFERENCES jeu,
+	role varchar(20),
+  highscore integer
+);
+
+CREATE TABLE save (
+	id_avatar bigint REFERENCES avatar,
+  id_jeu bigint REFERENCES jeu,
+	date_s date,
+  nb_pv integer,
+  fichier varchar(50) UNIQUE NOT NULL,
+  PRIMARY KEY (id_avatar, id_jeu, date_s)
+);
+
+mail varchar(50) CHECK(mail LIKE '%@%'),
+
+CREATE TABLE ville (
+	id_ville serial PRIMARY KEY,
+  nom_ville varchar(50),
+	code_postal integer,
+);
+
+INSERT INTO ville VALUES(DEFAULT,'Aix en Provence',13100);
+INSERT INTO ville VALUES(DEFAULT,'Brette les Pins',72250);
+INSERT INTO ville VALUES(DEFAULT,'Foix',09000);
+INSERT INTO ville VALUES(DEFAULT,'Dunkerque',59640);
+INSERT INTO ville VALUES(DEFAULT,'Grenoble',38000);
+INSERT INTO ville VALUES(DEFAULT,'Annecy',74000);
+
+9)
+\i ~/BaseDeDonnees/Script_PlateformeJeux.txt
+
+10)
+ALTER TABLE visiteur ADD id_ville bigint REFERENCES ville;
+UPDATE visiteur SET id_ville=(SELECT id_ville FROM ville WHERE visiteur.ville=nom_ville);
+ALTER TABLE visiteur DROP COLUMN ville;
+
+11)
+UPDATE visiteur SET id_ville=(SELECT id_ville FROM ville WHERE nom_ville='Aix en Provence') WHERE login='Ian';
+UPDATE visiteur SET id_ville=(SELECT id_ville FROM ville WHERE nom_ville='Brette les Pins') WHERE login='Sean';
+
+12)
+ALTER TABLE jeu RENAME COLUMN nb_joueur TO nb_joueur_max;
+
+
+--COMMANDES SQL
+
+13)
+SELECT COUNT(*) FROM visiteur;
+
+14)
+SELECT id_avatar FROM avatar WHERE id_avatar=ANY(SELECT partie.id_avatar FROM partie WHERE id_jeu=(SELECT jeu.id_jeu FROM jeu WHERE jeu.nom_jeu='League of Angels'));
+
+15)
+
+
+
+--EXAMEN
+
+1)
+ALTER TABLE save ADD id_visiteur bigint REFERENCES visiteur;
+
+2)
+UPDATE save SET id_visiteur=(SELECT id_visiteur FROM avatar WHERE save.id_avatar=id_avatar);
+
+3)
+INSERT INTO save VALUES((SELECT id_avatar FROM avatar WHERE id_visiteur=(SELECT id_visiteur FROM visiteur WHERE login='Elijah') AND nom_avatar='Wajdi'),(SELECT id_jeu FROM jeu WHERE nom_jeu='Forge of Empire'),current_date,106,'/Save/Part001_FoE.txt');
+
+4)
+
+5)
+SELECT nom_avatar FROM avatar WHERE id_avatar=ANY(SELECT id_avatar FROM save WHERE nb_pv>80);
+
+6)
